@@ -1,0 +1,16 @@
+
+# Black is a style guide checker that enforces a consistent coding style
+# across our project. Black helps eliminate conflicts in terms of style choices
+# allowing for us to not have to worry about formatting issues (and luckily
+# our github workflow fixes these issues automatically!!).
+
+# This file is a configuration for our black checker. We're specifically just
+# configuring the line-length within our code.
+# This value is the same as the .flake8 file, it's just good to include it here too!
+
+[tool.black]
+line-length = 150
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "web_project.settings"  # Change this if your settings file is in another location
+python_files = "tests.py"

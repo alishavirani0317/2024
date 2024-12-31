@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:13  # Use your preferred version of PostgreSQL
+    environment:
+      POSTGRES_DB: gradebuddy
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persist data
+    networks:
+      - web_project_app_network
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: ["dockerize", "-wait", "tcp://db:5432", "-timeout", "60s", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+    volumes:
+      - .:/code  # Mount your code directory
+    ports:
+      - "8000:8000"  # Expose Django app on port 8000
+    environment:
+      - DEBUG=True  # Set other environment variables if needed
+      - DB_HOST=db
+      - DB_NAME=gradebuddy
+      - DB_USER=admin
+      - DB_PASSWORD=password
+      - DJANGO_SETTINGS_MODULE=web_project.settings
+    depends_on:
+      - db
+    networks:
+      - web_project_app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  web_project_app_network:
+    driver: bridge
