@@ -1,0 +1,334 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'output.css' %}"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Freeman&display=swap" rel="stylesheet">
+    <title>GradeBuddy</title>
+</head>
+<body class="bg-light-cactus h-screen flex flex-col">
+    <!-- Header -->
+    <header class="font-sans bg-desertrose border-3 border-dark-terracotta flex justify-between items-center p-4">
+        
+        <!-- Home Button-->
+        <button id="back-button" class="bg-transparent border-none cursor-pointer w-8 h-8">
+            <img src="{% static 'images/back-icon.png' %}" alt="Home Page" class="w-full h-full object-contain" />
+        </button>
+        
+        <!-- Title -->
+        <h1 class="text-champagne font-sans text-2xl">{{ user.username }}'s GradeBuddy</h1>
+        
+        <!-- Logout Button -->
+        <button id="logout-button" class="bg-transparent border-none cursor-pointer w-8 h-8">
+            <img src="{% static 'images/logout-icon.png' %}" alt="Log Out" class="w-full h-full object-contain" />
+        </button>
+    
+    </header>
+
+    <!-- Class + Category Name -->
+    <div class="flex justify-center gap-4 mt-4 mb-8">
+        <div class="bg-light-marmalade border-3 border-darkorange text-white font-bold p-4 w-64 flex items-center justify-center">
+            <h2 class="text-4xl text-center" style="letter-spacing: 1.5px;">{{ class_name }}</h2>
+        </div>
+        <div class="bg-lightbeige border-3 border-darkbeige text-white font-bold p-4 w-64 flex items-center justify-center">
+            <h2 class="text-4xl text-center break-words" style="letter-spacing: 1.5px;">{{ category_name }}</h2>
+        </div>
+    </div>
+
+    <!-- Category Percentage and Desired Percentage -->
+    <div class="px-40 mt-4">
+        <div class="flex-for-line justify-between items-center">
+            <p class="text-3xl text-white font-sans overall-text">Category Percentage: {{ category.category_grade }}%</p>
+            <p class="text-3xl text-white font-sans desired-text">Desired Percentage: {{ desired_percentage }}%</p>
+        </div>
+        <!-- Horizontal Line -->
+        <div class="line"></div>
+    </div>
+
+    <!-- Assignment and Grade -->
+    <div class="px-40 mt-4">
+        <div class="flex-for-line justify-between items-center mb-4">
+            <p class="text-3xl text-desertrose font-sans assignment-text">Assignment:</p>
+            <p class="text-3xl text-desertrose font-sans grade-text">Grade:</p>
+        </div>
+    </div>
+
+    <!-- Add Assignment Button -->
+    <button id="add-assignment-button" class="bg-terracotta text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl fixed bottom-6 right-16 shadow-lg cursor-pointer">
+        +
+    </button>
+
+    <!-- Pop-up Form for Adding New Assignment -->
+    <div id="assignment-popup" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-3 border-darkbeige bg-beige p-6 rounded-md w-96 shadow-lg hidden">
+        <button id="close-assignment-popup" class="text-darkdesert absolute top-2 right-2 text-2xl">&times;</button>
+        <h2 class="text-center text-darkdesert text-xl font-semibold mb-4" style="letter-spacing: 1.5px">New Assignment</h2>
+        <form id="create-assignment-form">
+               {% csrf_token %}
+            <div class="mb-4">
+                <label for="assignment-name" class="block mb-2 text-darkdesert">Assignment Name</label>
+                <input type="text" id="assignment-name" class="w-full p-2 border border-gray-300 rounded" required />
+            </div>
+            <div class="mb-4">
+                <label for="assignment-grade" class="block mb-2 text-darkdesert">Assignment Grade</label>
+                <input type="number" id="assignment-grade" class="w-full p-2 border border-gray-300 rounded" required />
+            </div>
+            <button type="submit" class="bg-terracotta text-white w-full py-2 rounded hover:bg-[#A14F28] transition">
+                Add Assignment
+            </button>
+        </form>
+    </div>
+
+    <!-- List Container -->
+    <div id="assignmentListContainer" class="flex justify-center mt-8">
+        <div id="assignment-list" class="w-3/4">
+            {% for assignment in assignments %}
+            <div class="bg-lightgrey p-4 mb-4 flex items-center justify-between assignment-item">
+                <!-- Assignment Name -->
+                <h4 class="text-lg font-bold text-darkgrey ml-[200px]">{{ assignment.assignment_name }}</h4>
+
+                <div class="flex-grow"></div>
+
+                <!-- Assignment Grade -->
+                <p class="text-lg font-bold text-darkgrey mr-[250px]">{{ assignment.assignment_grade }}%</p>
+
+                <!-- Delete Button -->
+                <button
+                    class="text-black text-xl hover:text-red-600 font-bold delete-assignment-btn"
+                    data-assignment-id="{{ assignment.id }}">&times;
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- JavaScript for Assignment Popup, Buttons -->
+    <script>
+        const backButton = document.getElementById("back-button");
+        if (backButton) {
+            backButton.addEventListener("click", () => window.history.back());
+        }
+
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) location.reload();
+        });
+
+        document.getElementById("logout-button").addEventListener("click", () => {
+            window.location.href = "/login";
+        });
+
+        function showPopup(message, type, callback = null) {
+            // Create container to store popups
+            const popupContainer = document.createElement("div");
+            popupContainer.classList.add("popup-container");
+
+            // Create popup element and determine popup content
+            const popup = document.createElement("div");
+            
+            if (type === "confirm") {
+                popup.classList.add("popup", "border-black", "border-3");
+                
+                // Confirmation popup with Yes/No buttons
+                popup.innerHTML = `
+                    <p class="text-xl mb-4 font-normal">${message}</p>
+                    <div class="flex justify-center gap-4">
+                        <button id="popup-confirm-btn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Yes</button>
+                        <button id="popup-cancel-btn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">No</button>
+                    </div>
+                `;
+
+                // Add event listeners for confirmation buttons
+                setTimeout(() => {
+                    const confirmBtn = document.getElementById('popup-confirm-btn');
+                    const cancelBtn = document.getElementById('popup-cancel-btn');
+
+                    confirmBtn.addEventListener('click', () => {
+                        popupContainer.remove();
+                        if (callback) callback();
+                    });
+
+                    cancelBtn.addEventListener('click', () => {
+                        popupContainer.remove();
+                    });
+                }, 0);
+
+                popup.classList.add("popup-confirmation");
+            } else {
+                // success/error popup logic
+                popup.classList.add("popup", type === "success" ? "popup-success" : "popup-error");
+                popup.innerHTML = `<p>${message}</p>`;
+                const closeButton = document.createElement("button");
+                closeButton.classList.add("popup-close");
+                closeButton.innerText = "Close";
+
+                // Attach event listener to Close button
+                closeButton.addEventListener('click', () => {
+                    popupContainer.remove();
+                    if (typeof callback === "function") {
+                        callback(); // Basically just reloads the page so the changes are reflected
+                    }
+                });
+
+                popup.appendChild(closeButton);
+            }
+            
+            popupContainer.appendChild(popup);
+            document.body.appendChild(popupContainer);
+            popupContainer.style.display = "flex";
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const addAssignmentButton = document.getElementById('add-assignment-button');
+            const assignmentPopup = document.getElementById('assignment-popup');
+            const closeAssignmentPopupButton = document.getElementById('close-assignment-popup');
+            const createAssignmentForm = document.getElementById('create-assignment-form');
+            const userId = "{{ user.id }}";             // Receive USER ID
+            const classId = "{{ class_id }}";           // Receive CLASS ID
+            const categoryId = "{{ category.id }}";     // Receive CATEGORY ID
+            
+            // Open the pop-up when the "+" button is clicked
+            addAssignmentButton.addEventListener('click', () => {
+                            assignmentPopup.style.display = 'block';
+                        });
+
+            // Close the pop-up when the "x" button is clicked
+            closeAssignmentPopupButton.addEventListener('click', () => {
+                assignmentPopup.style.display = 'none';
+            });
+            
+            // Handle Form Submission for Assignment Creation
+            createAssignmentForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const assignmentName = document.getElementById('assignment-name').value;
+                const assignmentGrade = document.getElementById('assignment-grade').value;
+                
+                if (!assignmentName || !assignmentGrade) {
+                    alert("Please fill in both fields.");
+                    return;
+                }
+
+                const data = {
+                    assignment_name: assignmentName,
+                    assignment_grade: assignmentGrade,
+                    associated_category_id: categoryId,
+                };
+
+                // send POST request to create a new assignment
+                fetch(`/users/${userId}/classes/${classId}/categories/${categoryId}/assignments/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken(),  // Include CSRF token
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.id) {
+                        // Close the creation popup
+                        assignmentPopup.style.display = 'none';
+
+                        // add the new assignment to the page
+                        const assignmentListContainer = document.getElementById('assignment-list');
+                        const newAssignmentElement = document.createElement('div');
+                        newAssignmentElement.classList.add('bg-lightgrey', 'p-4', 'mb-4', 'flex', 'items-center', 'justify-between', 'assignment-item');
+
+                        // Set the assignment's inner HTML structure
+                        newAssignmentElement.innerHTML = `
+                            <button class="absolute top-2 right-2 text-black text-xl hover:text-red-600 font-bold delete-assignment-btn" data-assignment-id="${data.id}">
+                                &times;
+                            </button>
+                            <h4 class="text-lg font-bold text-darkgrey">${data.assignment_name}</h4> <!-- No margin here -->
+                            <p class="text-lg font-bold text-darkgrey">${data.assignment_grade}%</p> <!-- No margin here -->
+                        `;
+
+                        // append new assignmnt
+                        assignmentListContainer.appendChild(newAssignmentElement);
+
+                        // reset form
+                        document.getElementById('assignment-name').value = '';
+                        document.getElementById('assignment-grade').value = '';
+
+                        // Success Pop-Up
+                        showPopup(
+                            "Assignment created successfully! Click close to refresh.",
+                            "success",
+                            () => location.reload() // This will reload the screen for the user so changes are reflected
+                        );
+                    } else {
+                        showPopup(data.error || "Failed to create assignment.", "error");
+                    }
+                })
+                .catch(error => {
+                    showPopup("An error occured while creating the assignment.", "error");
+                });
+            });
+
+            // add event listener for the delete button
+            const assignmentList = document.getElementById('assignment-list');
+
+            if (assignmentList) {
+                assignmentList.addEventListener('click', function(event) {
+                    // check if the clicked element is the delete button
+                    const deleteButton = event.target.closest('.delete-assignment-btn');
+                    
+                    if (deleteButton) {
+                        // get assignment ID
+                        const assignmentId = deleteButton.getAttribute('data-assignment-id');
+                        
+                        if (assignmentId) {
+                            // find the parent assignmnt element
+                            const assignmentElement = deleteButton.closest('.assignment-item');
+
+                            // popup to confirm deletion
+                            showPopup(
+                                'Are you sure you want to delete this assignment?',
+                                "confirm",
+                                () => {
+                                    // Send DELETE request to the server
+                                    fetch(`/users/${userId}/classes/${classId}/categories/${categoryId}/assignments/`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRFToken': getCSRFToken()
+                                        },
+                                        body: JSON.stringify({ assignment_id: assignmentId }),
+                                    })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            assignmentElement.remove();
+                                            // Show a success popup
+                                            showPopup('Assignment deleted successfully!', 'success', () => location.reload());
+                                        } else {
+                                            showPopup('Failed to delete assignment.', 'error');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error("Error deleting assignment:", error);
+                                        showPopup("An error occurred while deleting the assignment.", "error");
+                                    });
+                                }
+                            )
+                        }
+                    }
+                });
+            }
+        });
+
+        // Function to get CSRF token from cookies
+        function getCSRFToken() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                .split('=')[1];
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

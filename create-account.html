@@ -1,0 +1,177 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang = "en">
+    <head> 
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'output.css' %}"/>
+        <!--i put a font embedded code link here-->
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Freeman&display=swap" rel="stylesheet">
+        <title>GradeBuddy</title>
+        <!--can put a cdn here for "font awesome" so we can use logos n all dat-->
+    </head> 
+    <body class = "font-sans bg-champagne flex justify-center items-center min-h-screen">
+        <!--form container-->
+        <div class="text-center bg-champagne p-8 rounded-lg max-w-md w-full">
+            <!--welcome text --> 
+            <h1 class="text-5xl text-desertrose">welcome to</h1>
+            <!--gradebuddy banner-->
+            <div class="mt-4 mb-8">
+                <h2 class="text-6xl text-champagne bg-desertrose py-2 px-6 inline-block">
+                    GradeBuddy
+                </h2>
+            </div>
+            <!--form-->
+            <form id="registerForm" method="POST">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <input type="email" id="email" name="email" placeholder="Email" class="w-full py-1.5 px-2 border-gray-300 rounded mt-1 font-sans">
+                    <!-- Added id=email to ensure that the information inputted gets read -->
+                    <!-- Added name=email to ensure that backend can reference these values when processing data -->
+                </div>
+                <div class ="mb-4">
+                    <input type="text" id="username" name="username" placeholder="Username" class="w-full py-1.5 px-2 border-gray-300 rounded mt-1 font-sans">
+                    <!-- Added id=username to ensure that the information inputted gets read -->
+                    <!-- Added name=username to ensure that backend can reference these values when processing data -->
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="password" name="password" placeholder="Password" class="w-full py-1.5 px-2 border-gray-300 rounded mt-1 font-sans">
+                    <!-- Added id=password to ensure that the information inputted gets read -->
+                    <!-- Added name=password to ensure that backend can reference these values when processing data -->
+                </div>
+                <button type="submit" class="bg-cactus text-champagne py-1 px-3 rounded-lg hover:bg-green-700 font-sans">
+                    REGISTER
+                </button>
+            </form>
+            <!--Link to Login-->
+            <div class="mt-4 text-sm">
+                <span class="text-desertrose font-semibold font-sans" stlye="letter-spacing: 1.5px">already an existing user?</span>
+                <a href = "{% url 'login' %}"> 
+                    <!--this is so that when you click a button that takes you back to login, it replaces the whole URL instead of adding on to it-->
+                    <button class="bg-cactus text-champagne py-0.5 px-2 rounded-lg hover:bg-green-600 font-sans">
+                        back to login
+                    </button>
+                </a>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+            // Function to create and display a popup
+            function showPopup(message, type) {
+                // Create a popup container
+                const popupContainer = document.createElement("div");
+                popupContainer.classList.add("popup-container");
+
+                // Create the popup box
+                const popup = document.createElement("div");
+
+                // Add the specific class for success or error
+                popup.classList.add("popup", type === "success" ? "popup-success" : "popup-error");
+
+                // Add the message to the popup
+                popup.innerHTML = `<p>${message}</p>`;
+
+                // Create a close button
+                const closeButton = document.createElement("button");
+                closeButton.classList.add("popup-close", "bg-cactus", "text-champagne", "py-0.5", "px-2", "rounded-lg", "hover:bg-green-600", "font-sans");
+                closeButton.innerText = "Close";
+                
+                // Close the popup when clicked
+                closeButton.addEventListener("click", () => {
+                popupContainer.style.display = "none";
+                });
+
+                // Append the close button to the popup
+                popup.appendChild(closeButton);
+
+                // Append the popup to the container
+                popupContainer.appendChild(popup);
+
+                // Append the container to the body
+                document.body.appendChild(popupContainer);
+
+                // Display the popup
+                popupContainer.style.display = "flex";
+                
+                // Automatically close the popup after 7 seconds
+                setTimeout(() => {
+                popupContainer.style.display = "none";
+                }, 7000);
+            }
+
+            // Simulate a form submission result (for testing)
+            function handleFormSubmission(isSuccess) {
+                if (isSuccess) {
+                showPopup("Registration successful!", "success");
+                } else {
+                showPopup("Registration failed! Please try again.", "error");
+                }
+            }
+
+            function redirectToLogin() {
+                window.location.href = "{% url 'login' %}"
+            }
+            
+            // Ensure modals are hidden initially
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('successModal').classList.add('hidden');
+                document.getElementById('errorModal').classList.add('hidden');
+            });
+            
+            document.getElementById("registerForm").addEventListener("submit", async function(event) {
+                event.preventDefault(); 
+                
+                // Get CSRF Token
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; 
+                
+                // Get form data
+                const formData = {
+                    email: document.getElementById('email').value,
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                };
+                
+                try {
+                    const response = await fetch('{% url "register" %}', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken    
+                            // CSRF Token is used for security purposes (prevent unautherized actions)
+                        },
+                        body: JSON.stringify(formData)
+                        // represents the content sent to the server
+                        // converts it into JSON String
+                        // this is a commonly used format for sending data between clients and servers
+                    });
+                    
+                    if (response.ok) {
+                        // Registration successful - display success popup and redirect
+                        showPopup("Registration successful! Redirecting you to login...", "success");
+                        setTimeout(redirectToLogin, 2000); // Redirect after 2 seconds
+                    } else {
+                        const data = await response.json();
+                        // Show error popup with the server-provided message or a default message
+                        showPopup(`Registration failed: ${data.message || "Unknown error occurred"}`, "error");
+                    }
+                } catch (error) {
+                    // Show error popup for request failure
+                    showPopup(`Request failed: ${error.message}`, "error");
+                }
+          });
+        //   function showModal() {
+        //     document.getElementById("successModal").classList.remove("hidden");
+        // }
+
+        // function closeModal() {
+        //     document.getElementById("successModal").classList.add("hidden");
+        // }
+        </script>
+    </body>
+</html>

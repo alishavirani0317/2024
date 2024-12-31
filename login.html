@@ -1,0 +1,134 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'output.css' %}"/>
+    <!-- Font link -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Freeman&display=swap" rel="stylesheet">
+    <title>GradeBuddy</title>
+</head> 
+<body class="font-sans bg-champagne flex justify-center items-center min-h-screen">
+    <!-- Form container -->
+    <div class="text-center bg-champagne p-8 rounded-lg max-w-md w-full">
+        <!-- GradeBuddy banner -->
+        <div class="mt-4 mb-8">
+            <h2 class="text-6xl text-champagne bg-desertrose py-2 px-6 inline-block">
+                GradeBuddy
+            </h2>
+        </div>
+        <!-- Form -->
+        <form id="loginForm" method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <input type="text" id="username" placeholder="Username" class="w-full py-1.5 px-2 border-gray-300 rounded mt-1 font-sans">
+            </div>
+            <div class="mb-4">
+                <input type="password" id="password" placeholder="Password" class="w-full py-1.5 px-2 border-gray-300 rounded mt-1 font-sans">
+            </div>
+            <button type="submit" class="bg-cactus text-champagne py-1 px-3 rounded-lg hover:bg-green-700 font-sans">
+                GO
+            </button>
+        </form>
+        <!-- Link to Create Account -->
+        <div class="mt-4 text-sm">
+            <a href="{% url 'register' %}">
+                <button class="bg-cactus text-champagne py-0.5 px-2 rounded-lg hover:bg-green-600 font-sans">
+                    new user
+                </button>
+            </a>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function showPopup(message, type) {
+            // Create container to store popups
+            const popupContainer = document.createElement("div");
+            popupContainer.classList.add("popup-container");
+
+            // Create popup elemeent and determine if success or error popup
+            const popup = document.createElement("div");
+            popup.classList.add("popup", type === "success" ? "popup-success" : "popup-error");
+
+            // Displays corresponding message to success/error popup
+            popup.innerHTML = `<p>${message}</p>`;
+
+            // Logic to close the popup button + styling
+            const closeButton = document.createElement("button");
+            closeButton.classList.add("popup-close", "bg-cactus", "text-champagne", "py-0.5", "px-2", "rounded-lg", "hover:bg-green-600", "font-sans");
+            closeButton.innerText = "Close";
+
+            // Close button logic (close on click)
+            closeButton.addEventListener("click", () => popupContainer.remove());
+
+            // Remove popup from screen
+            popup.appendChild(closeButton);
+            popupContainer.appendChild(popup);
+            document.body.appendChild(popupContainer);
+
+            popupContainer.style.display = "flex";
+
+            // automatic timer to remove the popup
+            setTimeout(() => popupContainer.remove(), 7000);
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        const csrftoken = getCookie('csrftoken');
+        
+        // Retrieve CSRF token
+        // const csrftoken = "{{ csrf_token }}";
+
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault();  
+            
+            // Access inputs by their IDs
+            const username = document.getElementById("username").value; 
+            const password = document.getElementById("password").value;
+
+            // Logging to see if we capture form values correctly
+            console.log(`Username: ${username}, Password: ${password}`);
+
+            try {
+                const response = await fetch('/login/api/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken // Include CSRF token in the headers
+                    },
+                    body: JSON.stringify({ username, password}) // Sending the request
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    console.log("Success:", data);
+                    // Redirect to classes page using the user ID received
+                    window.location.href = `/users/${data.user_id}/classes/`;  // Directly navigate to classes page
+                } else {
+                    showPopup(data.error || "Invalid login credentials.", "error");
+                }
+            } catch (error) {
+                showPopup("A network error occurred. Please try again.", "error");
+            }
+        });
+    </script>        
+</body>
+</html>
