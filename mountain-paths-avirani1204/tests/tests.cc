@@ -1,8 +1,6 @@
 // clang-format off
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
-//  Written By : Student Name                    Environment : ubuntu:bionic               //
-//  Date ......: 2023/06/02                      Compiler ...: clang++                   //
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 // clang-format on
@@ -119,7 +117,7 @@ TEST_CASE("ed_too_much", "[ed_too_much]") {
   constexpr size_t kTestFileHeight = 1;
   REQUIRE_THROWS(ElevationDataset(kTestFile, kTestFileWidth, kTestFileHeight));
 }
-// mine
+
 TEST_CASE("elevation_dataset constructor ", "[elevation_dataset]") {
   const std::string kTestFile = "example-data/ex_input_data/forward-2-3.dat";
   constexpr size_t kTestFileWidth = 2;
@@ -129,10 +127,10 @@ TEST_CASE("elevation_dataset constructor ", "[elevation_dataset]") {
 
   // test constructor & data getting
   ElevationDataset ed(kTestFile, kTestFileWidth, kTestFileHeight);
-  const std::vector<std::vector<int>> kStudentElevationData = ed.GetData();
+  const std::vector<std::vector<int>> kElevationData = ed.GetData();
 
   // check if data matches ground truth
-  REQUIRE(kStudentElevationData == kElevationDataGroundTruth);
+  REQUIRE(kElevationData == kElevationDataGroundTruth);
 }
 
 TEST_CASE("elevation_dataset width & height", "[elevation_dataset]") {
@@ -189,18 +187,18 @@ TEST_CASE("Example Grayscale Data Test", "[gi-forward-2-3]") {
 
   ElevationDataset ed(kTestFile, kTestFileWidth, kTestFileHeight);
   GrayscaleImage gi(ed);
-  const auto& student_image_data = gi.GetImage();
+  const auto& s_image_data = gi.GetImage();
 
-  // Are the vectors kImageGroundTruth and student_image_data
+  // Are the vectors kImageGroundTruth and simage_data
   // identical? If so, pass test.
-  REQUIRE(std::equal(student_image_data.begin(),
-                     student_image_data.end(),
+  REQUIRE(std::equal(s_image_data.begin(),
+                     s_image_data.end(),
                      kImageGroundTruth.begin()));
 }
 
 TEST_CASE("PPM Example Test: Grayscale image from prompt_5w_2h.ppm",
           "[ppm_ex_grayscale_prompt_5w_2h]") {
-  const std::string kStudentOutput =
+  const std::string kOutput =
       "./student_out/ex_grayscale_prompt_5w_2h.ppm";
   const std::string kTestFile = "./example-data/ex_input_data/prompt_5w_2h.dat";
   const std::string kGroundTruth =
@@ -209,8 +207,8 @@ TEST_CASE("PPM Example Test: Grayscale image from prompt_5w_2h.ppm",
   constexpr size_t kTestFileHeight = 2;
   ElevationDataset ed(kTestFile, kTestFileWidth, kTestFileHeight);
   GrayscaleImage gi(ed);
-  gi.ToPpm(kStudentOutput);
-  REQUIRE(CompareFiles(kStudentOutput, kGroundTruth));
+  gi.ToPpm(kOutput);
+  REQUIRE(CompareFiles(kOutput, kGroundTruth));
 }
 
 // mine
@@ -227,11 +225,11 @@ TEST_CASE("GrayscaleImage Constructor with ElevationDataset",
 
   ElevationDataset ed(kTestFile, kTestFileWidth, kTestFileHeight);
   GrayscaleImage gi(ed);
-  const auto& student_image_data = gi.GetImage();
+  const auto& image_data = gi.GetImage();
 
   // Check if the image data matches the ground truth
-  REQUIRE(std::equal(student_image_data.begin(),
-                     student_image_data.end(),
+  REQUIRE(std::equal( image_data.begin(),
+                      image_data.end(),
                      kImageGroundTruth.begin()));
 }
 // values for groundtruths are not correct
@@ -252,15 +250,9 @@ TEST_CASE("GrayscaleImage Constructor with ElevationDataset",
 //        Color(115, 0, 102),
 //        Color(102, 0, 102)}};
 
-//   GrayscaleImage gi(kTestFile, kTestFileWidth, kTestFileHeight);
-//   const auto& student_image_data = gi.GetImage();
-//   gi.ToPpm("./student_out/ex_grayscale_prompt_5w_2h_.ppm");
 
-//   // Check if the image data matches the ground truth
-//   REQUIRE(std::equal(student_image_data.begin(),
-//                      student_image_data.end(),
-//                      kImageGroundTruth.begin()));
-// }
+
+
 
 TEST_CASE("grayscaleimage width & height", "[grayscale image]") {
   const std::string kTestFile = "./example-data/ex_input_data/forward-2-3.dat";
@@ -299,16 +291,16 @@ TEST_CASE("Example Navigation Test: Go forward.", "[forward-2-3]") {
   PathImage pi(gi, ed);
 
   // Let's get the path's vector from `pi`
-  const auto& student_paths = pi.Paths();
+  const auto& s_paths = pi.Paths();
 
   // We want to analyze the program's behavior on the path starting from Row 1,
   // so let's get the path we created for that row.
-  const auto& student_path_to_evaluate = student_paths.at(1).GetPath();
+  const auto& s_path_to_evaluate = s_paths.at(1).GetPath();
 
   // Now let's compare that path to the expected path stored in
   // kPathToEvaluateGroundTruth.
-  REQUIRE(std::equal(student_path_to_evaluate.begin(),
-                     student_path_to_evaluate.end(),
+  REQUIRE(std::equal(s_path_to_evaluate.begin(),
+                     s_path_to_evaluate.end(),
                      kPathToEvaluateGroundTruth.begin()));
 }
 
@@ -321,10 +313,10 @@ TEST_CASE("Example Navigation Test: Go Up.", "[forward-up-2-3]") {
   ElevationDataset ed(kTestFile, kTestFileWidth, kTestFileHeight);
   GrayscaleImage gi(ed);
   PathImage pi(gi, ed);
-  const auto& student_paths = pi.Paths();
-  const auto& student_path_to_evaluate = student_paths.at(1).GetPath();
-  REQUIRE(std::equal(student_path_to_evaluate.begin(),
-                     student_path_to_evaluate.end(),
+  const auto& s_paths = pi.Paths();
+  const auto& s_path_to_evaluate = s_paths.at(1).GetPath();
+  REQUIRE(std::equal(s_path_to_evaluate.begin(),
+                     s_path_to_evaluate.end(),
                      kPathToEvaluateGroundTruth.begin()));
 }
 
@@ -334,7 +326,7 @@ TEST_CASE("Example Navigation Test: Go Up.", "[forward-up-2-3]") {
 
 TEST_CASE("Example Test: Path image from prompt_5w_2h.ppm",
           "ex_path_image_prompt_5w_2h]") {
-  const std::string kStudentOutput =
+  const std::string kOutput =
       "./student_out/ex_path_image_prompt_5w_2h.ppm";
   const std::string kTestFile = "./example-data/ex_input_data/prompt_5w_2h.dat";
   const std::string kGroundTruth =
@@ -344,8 +336,8 @@ TEST_CASE("Example Test: Path image from prompt_5w_2h.ppm",
   ElevationDataset ed(kTestFile, kTestFileWidth, kTestFileHeight);
   GrayscaleImage gi(ed);
   PathImage pi(gi, ed);
-  pi.ToPpm(kStudentOutput);
-  REQUIRE(CompareFiles(kStudentOutput, kGroundTruth));
+  pi.ToPpm(kOutput);
+  REQUIRE(CompareFiles(kOutput, kGroundTruth));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
