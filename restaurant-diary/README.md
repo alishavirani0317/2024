@@ -8,7 +8,12 @@ alisha git stuff to avoid issues
 
 
 running backend server:
-    uvicorn main:app --reload
+    1. cd into backend
+    2. python -m venv venv
+    3. source venv/bin/activate
+    4. pip install fastapi uvicorn python-multipart
+    5. uvicorn main:app --reload
+    
 
 running frontend server:
     npm start
