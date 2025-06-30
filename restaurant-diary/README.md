@@ -6,3 +6,9 @@ alisha git stuff to avoid issues
 4. git commit -m "blabla"
 5. git push origin main
 
+
+running backend server:
+    uvicorn main:app --reload
+
+running frontend server:
+    npm start
