@@ -16,3 +16,11 @@ git steps to save:
     2. git add .
     3. git commit -m "message"
     4. git push origin main
+
+
+personal notes:
+Frontend (User Interface) – What the user sees and interacts with
+
+Backend (API Server) – The logic that processes requests (add, delete, list restaurants)
+
+Database (SQLite) – Where the restaurant data is stored
