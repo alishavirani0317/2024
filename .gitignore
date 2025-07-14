@@ -1,1 +1,11 @@
+frontend/venv/
+__pycache__/
+*.pyc
+
+# Go
+backend/bin/
+*.exe
+*.out
+
+# macOS system files
 .DS_Store
