@@ -19,8 +19,8 @@ git steps to save:
 
 
 personal notes:
-Frontend (User Interface) – What the user sees and interacts with
+    Frontend (User Interface) – What the user sees and interacts with
 
-Backend (API Server) – The logic that processes requests (add, delete, list restaurants)
+    Backend (API Server) – The logic that processes requests (add, delete, list restaurants)
 
-Database (SQLite) – Where the restaurant data is stored
+    Database (SQLite) – Where the restaurant data is stored
