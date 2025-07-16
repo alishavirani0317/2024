@@ -31,6 +31,9 @@
             </div>
         </div>
     </nav>
+    <!--show flashed messages in auth-->
+    {% with messages = get_flashed_messages(with_categories=true)%}
+    {% endwith %}
     <div class = "container">
         {% block content %}
         {% endblock %}
