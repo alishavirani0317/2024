@@ -20,6 +20,8 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
+    create_database(app)
+    
     # create db
     from .models import User, Note 
     login_manager = LoginManager()
@@ -30,8 +32,6 @@ def create_app():
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
-
-    create_database(app)
     
     return app
 
