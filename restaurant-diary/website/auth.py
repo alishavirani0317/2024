@@ -22,11 +22,11 @@ def sign_up():
 
         if len(email) < 4:
             #alert user if something went wrong (message flashing (import flash))
-            flash('Email must be greater than 4 characters.', category='error')
+            flash('Email must be greater than 3 characters.', category='error')
 
         
         elif len(firstName) < 2:
-            flash('First name must be greater than 2 characters.', category='error')
+            flash('First name must be greater than 1 character.', category='error')
 
         elif password1 != password2:
             flash('Passwords do not match.', category='error')
