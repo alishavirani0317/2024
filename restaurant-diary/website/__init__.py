@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 
 db = SQLAlchemy() # define new databse
-DB_NAME = "databse.db"
+DB_NAME = "database.db"
 
 
 def create_app():
