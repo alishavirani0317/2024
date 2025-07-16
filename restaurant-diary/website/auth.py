@@ -33,8 +33,10 @@ def login():
     return render_template("login.html", boolean=True)
 
 @auth.route('/logout')
+@login_required # cannot access this page unless user is logged in
 def logout():
-    return "<p>Logout</p>"
+    logout_user()
+    return redirect(url_for('auth.login'))
 
 @auth.route('/sign-up', methods=['GET', 'POST'])
 
