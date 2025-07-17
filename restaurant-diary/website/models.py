@@ -21,3 +21,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     entries = db.relationship('RestuarantEntry') # everytime we can make a note, add into this users' notes relationship that notes id
+
+# flask shell
+# >>> from website import db
+# >>> db.create_all() 
