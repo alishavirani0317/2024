@@ -8,9 +8,11 @@ function App() {
     //return just one root element per level
     // fragment -> empty tag <>
     <>
-      <MovieCard movie={{title: "Alisha's Film", release_date:"2024"}}/>
-      <MovieCard movie={{title: "Dih's Film", release_date:"2024"}}/>
-
+      {movieNumber == 1 ? (
+        <MovieCard movie={{title: "Alisha's Film", release_date:"2024"}}/> 
+      ) : ( 
+        <MovieCard movie={{title: "Dih's Film", release_date:"2024"}}/>
+      )}
     </>
   );
 }
